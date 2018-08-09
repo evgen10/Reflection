@@ -96,11 +96,14 @@ namespace MyIoc
         {
             if (HasAttributeImport(type))
             {
-                object result;
+                if (type.GetProperties().Where(t => t.GetCustomAttribute<ImportAttribute>() != null).Count() != 0)
+                {
+                    return InstanceByProperty(type);
+                }
 
-                //result = InstanceByConstructor(type);
-                result = InstanceByProperty(type);
-                return result;
+
+                return InstanceByConstructor(type);
+
 
             }
             else
@@ -112,22 +115,22 @@ namespace MyIoc
 
         private object InstanceByProperty(Type type)
         {
-            var properties = type.GetProperties().Where(p => p.GetCustomAttribute<ImportAttribute>() != null);    
-            object result =  Activator.CreateInstance(type);
+            var properties = type.GetProperties().Where(p => p.GetCustomAttribute<ImportAttribute>() != null);
+            object result = Activator.CreateInstance(type);
 
             foreach (var prop in properties)
             {
                 Type value;
 
                 if (exportDictionary.TryGetValue(prop.PropertyType, out value))
-                {                   
+                {
                     prop.SetValue(result, Activator.CreateInstance(value));
                 }
                 else
                 {
                     throw new Exception($"Does not have dependence for {prop.Name}");
                 }
-                
+
             }
 
             return result;
@@ -136,7 +139,7 @@ namespace MyIoc
 
         private object InstanceByConstructor(Type type)
         {
-            var constructor = GetConstractor(type);
+            var constructor = GetConstructor(type);
             var constractorParameters = constructor.GetParameters();
 
             List<object> parametrs = new List<object>();
@@ -159,7 +162,7 @@ namespace MyIoc
             return Activator.CreateInstance(type, parametrs.ToArray());
         }
 
-        private ConstructorInfo GetConstractor(Type type)
+        private ConstructorInfo GetConstructor(Type type)
         {
             var constractors = type.GetConstructors();
 
