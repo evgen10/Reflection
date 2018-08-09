@@ -1,0 +1,5 @@
+D:\Tasks\Code\Task5.Reflection\MyIoc\bin\Debug\MyIoc.dll
+D:\Tasks\Code\Task5.Reflection\MyIoc\bin\Debug\MyIoc.pdb
+D:\Tasks\Code\Task5.Reflection\MyIoc\obj\Debug\MyIoc.dll
+D:\Tasks\Code\Task5.Reflection\MyIoc\obj\Debug\MyIoc.pdb
+D:\Tasks\Code\Task5.Reflection\MyIoc\obj\Debug\MyIoc.csprojResolveAssemblyReference.cache

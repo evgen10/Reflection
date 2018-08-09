@@ -1,0 +1,8 @@
+D:\Tasks\Code\Task5.Reflection\Task5\bin\Debug\Task5.exe.config
+D:\Tasks\Code\Task5.Reflection\Task5\bin\Debug\Task5.exe
+D:\Tasks\Code\Task5.Reflection\Task5\bin\Debug\Task5.pdb
+D:\Tasks\Code\Task5.Reflection\Task5\obj\Debug\Task5.csprojResolveAssemblyReference.cache
+D:\Tasks\Code\Task5.Reflection\Task5\obj\Debug\Task5.exe
+D:\Tasks\Code\Task5.Reflection\Task5\obj\Debug\Task5.pdb
+D:\Tasks\Code\Task5.Reflection\Task5\bin\Debug\MyIoc.dll
+D:\Tasks\Code\Task5.Reflection\Task5\bin\Debug\MyIoc.pdb
