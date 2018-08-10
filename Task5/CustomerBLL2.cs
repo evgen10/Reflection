@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 
 namespace Task5
 {
+   
     public class CustomerBLL2
     {
         [Import]
@@ -15,6 +16,6 @@ namespace Task5
         [Import]
         public Logger Logger { get; set; }
 
-        public ConsoleCancelEventArgs TT { get; set; }
+   
     }
 }

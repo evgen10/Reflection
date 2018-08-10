@@ -10,9 +10,11 @@ namespace MyIoc
 {
     public class Container
     {
-        private Dictionary<Type, Type> importDictionary;
-        private Dictionary<Type, Type> exportDictionary;
 
+        //для хранения типов помеченных как Import
+        private Dictionary<Type, Type> importDictionary;
+        //для хранения типов помеченных как Export
+        private Dictionary<Type, Type> exportDictionary;
 
         public Container()
         {
@@ -20,66 +22,68 @@ namespace MyIoc
             exportDictionary = new Dictionary<Type, Type>();
         }
 
+        //добавляет в контейнер типы в сборке помеченные атрибутами(Import, Export)
         public void AddAssembly(Assembly assembly)
         {
             var types = assembly.ExportedTypes;
 
             foreach (var type in types)
             {
+                int value = DefineAttribute(type);
 
-                int val = DefineAttribute(type);
-
-                if (val == 1)
+                if (value == 1)
                 {
                     importDictionary.Add(type, type);
                 }
-                if (val == 0)
+                if (value == 0)
                 {
+                    //если класс помечен  атрибутом export
                     var attributes = type.GetCustomAttribute<ExportAttribute>();
-
+                    //добавляем как ключ в словарь параметр атрибута если он есть иначе сам тип
                     exportDictionary.Add(attributes.Contract ?? type, type);
-
                 }
-
 
             }
 
         }
-
+        
+        //добавляет в контейнер конкретный тип
         public void AddType(Type type)
         {
-            int val = DefineAttribute(type);
+            int value = DefineAttribute(type);
 
-            if (val == 1)
+            if (value == 1)
             {
                 importDictionary.Add(type, type);
             }
-            else if (val == 0)
+            else if (value == 0)
             {
                 exportDictionary.Add(type, type);
             }
             else
             {
-                throw new Exception("Attribute missing or invalid");
+                throw new ContainerException("Attribute missing or invalid");
             }
+
+
+
         }
 
+        //добавляет в контейнер тип и его базовый класс
+        //предназначен для внедряемого класса
         public void AddType(Type type, Type baseType)
         {
-
             if (DefineAttribute(type) == 0)
             {
                 exportDictionary.Add(baseType, type);
             }
             else
             {
-                throw new Exception("Attribute missing or invalid");
+                throw new ContainerException("Attribute missing or invalid");
             }
 
         }
-
-
-
+        
         public object CreateInstance(Type type)
         {
             return Instance(type);
@@ -87,32 +91,34 @@ namespace MyIoc
 
         public T CreateInstance<T>()
         {
-
             return (T)Instance(typeof(T));
         }
 
-
+        //инициализирует тип в зависимости от способа инициализации
         private object Instance(Type type)
         {
+            //если передаваемый тип содержится в контейнере
             if (HasAttributeImport(type))
             {
+                // если свойства в классе помечены атрибутом Import
                 if (type.GetProperties().Where(t => t.GetCustomAttribute<ImportAttribute>() != null).Count() != 0)
                 {
+                    //инициализируем по свойствам 
                     return InstanceByProperty(type);
                 }
 
-
+                //иначе по конструктору 
                 return InstanceByConstructor(type);
-
 
             }
             else
             {
-                throw new Exception("Attribute missing or invalid");
+                throw new ContainerException("Attribute missing or invalid");
             }
 
         }
 
+        //инициализирует зависимый тип по свойствам
         private object InstanceByProperty(Type type)
         {
             var properties = type.GetProperties().Where(p => p.GetCustomAttribute<ImportAttribute>() != null);
@@ -128,18 +134,19 @@ namespace MyIoc
                 }
                 else
                 {
-                    throw new Exception($"Does not have dependence for {prop.Name}");
+                    throw new ContainerException($"Does not have dependence for {prop.Name}");
                 }
-
             }
 
             return result;
 
         }
 
+        //инициализирует зависимый тип по конструктору
         private object InstanceByConstructor(Type type)
         {
             var constructor = GetConstructor(type);
+
             var constractorParameters = constructor.GetParameters();
 
             List<object> parametrs = new List<object>();
@@ -154,14 +161,14 @@ namespace MyIoc
                 }
                 else
                 {
-                    throw new Exception($"Does not have dependence for {parametr.Name}");
+                    throw new ContainerException($"Does not have dependence for {parametr.ParameterType} {parametr.Name} ");
                 }
-
             }
 
             return Activator.CreateInstance(type, parametrs.ToArray());
         }
 
+        //получает конструктор в указаном типе
         private ConstructorInfo GetConstructor(Type type)
         {
             var constractors = type.GetConstructors();
@@ -172,10 +179,11 @@ namespace MyIoc
             }
             else
             {
-                throw new Exception("Does not have public constructors");
+                throw new ContainerException("Does not have public constructors");
             }
         }
 
+        //проверяет находится ли в контейнере данный класс с атрибутом Import
         private bool HasAttributeImport(Type type)
         {
             if (importDictionary.ContainsKey(type))
@@ -186,7 +194,9 @@ namespace MyIoc
             return false;
         }
 
-        //возвращает 1 если класс помечен атрибуитом Import 0 если export -1 если не помечен данными атрибутами
+        //возвращает 1 если класс помечен атрибуитом Import
+        //0 если export 
+        //-1 если не помечен данными атрибутами
         private int DefineAttribute(Type type)
         {
             IEnumerable<Attribute> attribyteInfo = type.GetCustomAttributes<ImportAttribute>();
