@@ -15,29 +15,11 @@ namespace Task5
         {
             try
             {
-                var container = new Container();
+                Container container = new Container();
 
-                //container.AddAssembly(Assembly.GetExecutingAssembly());
+                AddAssembly(container);
 
-
-                container.AddType(typeof(Logger));
-                container.AddType(typeof(CustomerDAL), typeof(ICustomerDAL));
-
-
-                container.AddType(typeof(CustomerBLL1));
-                var ob = (CustomerBLL1)container.CreateInstance(typeof(CustomerBLL1));
-                var ob2 = container.CreateInstance<CustomerBLL1>();
-
-
-
-
-
-                //container.AddType(typeof(CustomerBLL2));
-                //var ob = (CustomerBLL2)container.CreateInstance(typeof(CustomerBLL2));
-                //var ob2 = container.CreateInstance<CustomerBLL2>();
-
-
-
+                AddType(container);
 
             }
             catch (ContainerException e)
@@ -47,10 +29,30 @@ namespace Task5
             catch (ArgumentException e)
             {
                 Console.WriteLine(e.Message);
-            }
-           
+            }           
 
             Console.WriteLine();
+        }
+
+        static void AddAssembly(Container container)
+        {        
+            container.AddAssembly(Assembly.GetExecutingAssembly());
+
+            var ob = (CustomerBLL2)container.CreateInstance(typeof(CustomerBLL2));
+            var ob2 = container.CreateInstance<CustomerBLL2>();
+        }
+
+        static void AddType(Container container)
+        {           
+
+            container.AddType(typeof(Logger));
+            container.AddType(typeof(CustomerDAL), typeof(ICustomerDAL));
+
+            container.AddType(typeof(CustomerBLL1));
+
+
+            var ob = (CustomerBLL1)container.CreateInstance(typeof(CustomerBLL1));
+            var ob2 = container.CreateInstance<CustomerBLL1>();
         }
     }
 }

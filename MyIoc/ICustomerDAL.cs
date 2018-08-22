@@ -6,8 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace MyIoc
-{
-  
+{  
     public interface ICustomerDAL
     {
         

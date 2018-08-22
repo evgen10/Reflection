@@ -39,7 +39,7 @@ namespace MyIoc
                 {
                     //если класс помечен  атрибутом export
                     var attributes = type.GetCustomAttribute<ExportAttribute>();
-                    //добавляем как ключ в словарь параметр атрибута если он есть иначе сам тип
+                    //добавляем как ключ в словарь параметр атрибута если он есть, иначе сам тип
                     exportDictionary.Add(attributes.Contract ?? type, type);
                 }
 
@@ -97,7 +97,7 @@ namespace MyIoc
         //инициализирует тип в зависимости от способа инициализации
         private object Instance(Type type)
         {
-            //если передаваемый тип содержится в контейнере
+            //если передаваемый тип помечен атрибутом Import
             if (HasAttributeImport(type))
             {
                 // если свойства в классе помечены атрибутом Import
@@ -199,7 +199,7 @@ namespace MyIoc
         //-1 если не помечен данными атрибутами
         private int DefineAttribute(Type type)
         {
-            IEnumerable<Attribute> attribyteInfo = type.GetCustomAttributes<ImportAttribute>();
+            IEnumerable<Attribute> attribyteInfo;
             IEnumerable<PropertyInfo> typeProp = type.GetProperties().Where(p => p.GetCustomAttribute<ImportAttribute>() != null);
 
             if (typeProp.Count() != 0)
